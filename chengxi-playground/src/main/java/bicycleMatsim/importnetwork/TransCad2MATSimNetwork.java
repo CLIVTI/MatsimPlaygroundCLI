@@ -10,10 +10,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import com.google.common.collect.Table;
 import com.opencsv.exceptions.CsvException;
@@ -26,7 +29,6 @@ public class TransCad2MATSimNetwork {
 
 	private final String tcLinksFileName;
 
-	private final String tcConnectorsFileName;
 
 	private final String matsimPlainNetworkFileName;
 
@@ -34,20 +36,20 @@ public class TransCad2MATSimNetwork {
 
 	private final String linkAttributesFileName;
 	
+	private final String nodeAttributesFileName;
 	
-	
 
 
 
-	public TransCad2MATSimNetwork(String tcNodesFileName, String tcLinksFileName, String tcConnectorsFileName,
-			String matsimPlainNetworkFileName, String matsimFullFileName, String linkAttributesFileName) {
+	public TransCad2MATSimNetwork(String tcNodesFileName, String tcLinksFileName,
+			String matsimPlainNetworkFileName, String matsimFullFileName, String nodeAttributesFileName, String linkAttributesFileName) {
 		super();
 		this.tcNodesFileName = tcNodesFileName;
 		this.tcLinksFileName = tcLinksFileName;
-		this.tcConnectorsFileName = tcConnectorsFileName;
 		this.matsimPlainNetworkFileName = matsimPlainNetworkFileName;
 		this.matsimFullFileName = matsimFullFileName;
 		this.linkAttributesFileName = linkAttributesFileName;
+		this.nodeAttributesFileName=nodeAttributesFileName;
 	} // end constructor
 
 
@@ -56,6 +58,7 @@ public class TransCad2MATSimNetwork {
         final Network matsimNetwork = NetworkUtils.createNetwork();
 		final NetworkFactory matsimNetworkFactory = matsimNetwork.getFactory();
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
+		final ObjectAttributes nodeAttributes = new ObjectAttributes();
 		
 		CsvReaderToIteratable nodeReader = new CsvReaderToIteratable(this.tcNodesFileName,';');
 		Table<String, String, String> nodeTable = nodeReader.readTableWithUniqueID("TransCadID");
@@ -63,7 +66,7 @@ public class TransCad2MATSimNetwork {
 		final CoordinateTransformation coordinateTransform = StockholmTransformationFactory.getCoordinateTransformation(
 				StockholmTransformationFactory.WGS84, StockholmTransformationFactory.WGS84_SWEREF99);
         
-		// Save the nodes into Matsim nodes
+		// (1) Save the nodes into Matsim nodes
 		//-----------------------------------
 		Set<String> TransCadNodeIDSet=nodeTable.rowKeySet();
 		for (String TransCadNodeID: TransCadNodeIDSet) {
@@ -71,22 +74,23 @@ public class TransCad2MATSimNetwork {
 			// transform each node into Matsim node object
 			double NodeLatitude= Double.parseDouble(ANode.get("latitude"));
 			double Nodelongtitude= Double.parseDouble(ANode.get("longtitude"));		
-			double NodeAltitude= Double.parseDouble(ANode.get("altitude"));	
-			final Coord coord = coordinateTransform.transform(new Coord(1e-6*Nodelongtitude, 1e-6*NodeLatitude, NodeAltitude));
+			
+			final Coord coord = coordinateTransform.transform(new Coord(1e-6*Nodelongtitude, 1e-6*NodeLatitude));
 			final Node matsimNode = matsimNetworkFactory.createNode(Id.create(TransCadNodeID, Node.class),coord);
 			System.out.println("Node added: "+TransCadNodeID);
 			matsimNetwork.addNode(matsimNode);
 			
+			String NodeAltitude= ANode.get("altitude");	
+			String CentroidID= ANode.get("CentroidID");	
+			nodeAttributes.putAttribute(TransCadNodeID, "Altitude",NodeAltitude);
+			nodeAttributes.putAttribute(TransCadNodeID, "CentroidID",CentroidID);
+			
 		}
-//		 Map<Id<Node>, ? extends Node> Nodemap = matsimNetwork.getNodes();
-//		 for (Entry<Id<Node>, ? extends Node> node:Nodemap.entrySet()) {
-//			 Id<Node> nodeId= node.getKey();
-//			 System.out.println("Node added: "+nodeId);
-//		 }
+		
 		nodeTable=null;
 		//----------------------------------
 		
-		// Save the links into Matsim links
+		// (2) Save the links into Matsim links
 		//----------------------------------
 		// to create matsim links you need 3 elements, ID (string) fromNode (Node) and toNode(Node)
 		CsvReaderToIteratable linkReader = new CsvReaderToIteratable(this.tcLinksFileName,';');
@@ -112,17 +116,55 @@ public class TransCad2MATSimNetwork {
 			// specify which other attributes you want to save as link attributes
 			double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed"))/3.6;// change back to: double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed")) * Units.M_S_PER_KM_H;
 			double bicycleGeneralizedCost= Double.parseDouble(ALink.get("generalizedCost"));
-			
+			String linkType= ALink.get("linkType");	
+			String lutning= ALink.get("lutning");	
+			String connector= ALink.get("skaft");	
 			
 			linkAttributes.putAttribute(TransCadLinkID, "bicycleSpeed_M_S",bicycleSpeedM_S);
 			linkAttributes.putAttribute(TransCadLinkID, "generalizedCost",bicycleGeneralizedCost);
-			
+			linkAttributes.putAttribute(TransCadLinkID, "linkType",linkType);
+			linkAttributes.putAttribute(TransCadLinkID, "slope",lutning);
+			linkAttributes.putAttribute(TransCadLinkID, "connector",connector);
 			
 			System.out.println("Link added: "+TransCadLinkID);
 		}
+		
+		linkTable=null;
+		
+		
+		// (3) write matsim network
+		NetworkWriter networkWriter = new NetworkWriter(matsimNetwork);
+		networkWriter.write(this.matsimFullFileName);
+		System.out.println();
+		System.out.println("------------------------------------------------------------");
+		System.out.println("RAW MATSIM NETWORK STATISTICS");
+		System.out.println("(This network is saved as " + this.matsimFullFileName + ".)");
+		System.out.println("Number of nodes: " + matsimNetwork.getNodes().size());
+		System.out.println("Number of links: " + matsimNetwork.getLinks().size());
+		System.out.println("------------------------------------------------------------");
+		System.out.println();
+		
+		NetworkCleaner cleaner = new NetworkCleaner();
+		cleaner.run(matsimNetwork);
+
+		System.out.println();
+		System.out.println("------------------------------------------------------------");
+		System.out.println("MATSIM NETWORK STATISTICS AFTER NETWORK CLEANING");
+		System.out.println("(This network is not saved to file.)");
+		System.out.println("Number of nodes: " + matsimNetwork.getNodes().size());
+		System.out.println("Number of links: " + matsimNetwork.getLinks().size());
+		System.out.println("------------------------------------------------------------");
+		System.out.println();
+		NetworkWriter plainNetworkWriter = new NetworkWriter(matsimNetwork);
+		plainNetworkWriter.write(this.matsimPlainNetworkFileName);
 		//----------------------------------
 		
+		// (4) write the node and link attribute files
+		final ObjectAttributesXmlWriter linkAttributesWriter = new ObjectAttributesXmlWriter(linkAttributes);
+		linkAttributesWriter.writeFile(this.linkAttributesFileName);
 		
+		final ObjectAttributesXmlWriter nodeAttributesWriter = new ObjectAttributesXmlWriter(nodeAttributes);
+		nodeAttributesWriter.writeFile(this.nodeAttributesFileName);
 		
 	} // end run()
 
@@ -131,18 +173,17 @@ public class TransCad2MATSimNetwork {
 	public static void main(String[] args) throws IOException, CsvException {
 		// final String inputPath = "./ihop2/network-input/";
 		final String inputPath = "C:/Users/ChengxiL/git/MatsimPlaygroundCLI/chengxi-playground/src/test/resources/";
-		final String nodesFile = inputPath + "Node.csv";
-		final String ConnectorsFile = inputPath + "Lane Connectors.csv";
+		final String nodesFile = inputPath + "Nodes.csv";
 		final String linksFile = inputPath + "Links.csv";
 		
 		// final String outputPath = "./ihop2/network-output/";
-		final String outputPath = "/.../";
-		final String matsimPlainFile = outputPath + "network.xml";
-		final String matsimFullFile = outputPath + "network-raw.xml";
-		final String linkAttributesFile = outputPath + "link-attributes.xml";
-		
-		TransCad2MATSimNetwork networktransformer = new TransCad2MATSimNetwork(nodesFile, linksFile, ConnectorsFile,
-				matsimPlainFile, matsimFullFile, linkAttributesFile);
+		final String outputPath = "C:/Users/ChengxiL/git/MatsimPlaygroundCLI/chengxi-playground/src/test/resources/";
+		final String matsimPlainFile = outputPath + "network_test.xml";
+		final String matsimFullFile = outputPath + "network_raw_test.xml";
+		final String linkAttributesFile = outputPath + "link_attributes_test.xml";
+		final String nodeAttributesFile = outputPath + "node_attributes_test.xml";
+		TransCad2MATSimNetwork networktransformer = new TransCad2MATSimNetwork(nodesFile, linksFile,
+				matsimPlainFile, matsimFullFile, nodeAttributesFile,linkAttributesFile);
 		
 		networktransformer.run();
 	} // end main

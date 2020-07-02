@@ -22,25 +22,25 @@
 <!-- ====================================================================== -->
 
 	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
-		<link id="1" from="6000" to="6001" length="1500.0" freespeed="5.555555555555555" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="1" from="6000" to="6001" length="1500.0" freespeed="5.555555555555555" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="10" from="6004" to="6005" length="1450.0" freespeed="6.111111111111111" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="10" from="6004" to="6005" length="1450.0" freespeed="6.111111111111111" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="2" from="6000" to="6002" length="1300.0" freespeed="2.7777777777777777" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="2" from="6000" to="6002" length="1300.0" freespeed="2.7777777777777777" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="3" from="6001" to="6003" length="1240.0" freespeed="4.166666666666667" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="3" from="6001" to="6003" length="1240.0" freespeed="4.166666666666667" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="4" from="6002" to="6003" length="2220.0" freespeed="3.888888888888889" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="4" from="6002" to="6003" length="2220.0" freespeed="3.888888888888889" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="5" from="6000" to="6003" length="3120.0" freespeed="4.166666666666667" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="5" from="6000" to="6003" length="3120.0" freespeed="4.166666666666667" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="6" from="6003" to="6000" length="3120.0" freespeed="4.444444444444445" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="6" from="6003" to="6000" length="3120.0" freespeed="4.444444444444445" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="7" from="6003" to="6005" length="1110.0" freespeed="3.888888888888889" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="7" from="6003" to="6005" length="1110.0" freespeed="3.888888888888889" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="8" from="6005" to="6003" length="1110.0" freespeed="3.0555555555555554" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="8" from="6005" to="6003" length="1110.0" freespeed="3.0555555555555554" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="9" from="6005" to="6004" length="1450.0" freespeed="5.833333333333333" capacity="1.0" permlanes="1.0" oneway="1" modes="bike" >
+		<link id="9" from="6005" to="6004" length="1450.0" freespeed="5.833333333333333" capacity="1.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
 	</links>
 
