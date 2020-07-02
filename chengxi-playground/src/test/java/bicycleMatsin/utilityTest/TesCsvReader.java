@@ -6,7 +6,7 @@ import java.util.Set;
 import com.google.common.collect.Table;
 import com.opencsv.exceptions.CsvException;
 
-import bicycleInMatsim.utility.CsvReaderToIteratable;
+import bicycleMatsim.utility.CsvReaderToIteratable;
 
 
 public class TesCsvReader {

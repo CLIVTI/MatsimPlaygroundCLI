@@ -1,4 +1,4 @@
-package bicycleInMatsim.utility;
+package bicycleMatsim.utility;
 
 import java.io.IOException;
 import java.io.Reader;

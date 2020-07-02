@@ -1,4 +1,4 @@
-package bicycleInMatsim.utility;
+package bicycleMatsim.utility;
 
 public class Test1 {
 

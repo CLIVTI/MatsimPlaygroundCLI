@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -23,8 +22,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import com.google.common.collect.Table;
 import com.opencsv.exceptions.CsvException;
 
-import bicycleInMatsim.utility.CsvReaderToIteratable;
-// import floetteroed.utilities.Units;
+import bicycleMatsim.utility.CsvReaderToIteratable;
 
 public class TransCad2MATSimNetwork {
 	private final String tcNodesFileName;
@@ -56,7 +54,6 @@ public class TransCad2MATSimNetwork {
 
 
 	private void run() throws IOException, CsvException {
-		// TODO Auto-generated method stub
         final Network matsimNetwork = NetworkUtils.createNetwork();
 		final NetworkFactory matsimNetworkFactory = matsimNetwork.getFactory();
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
