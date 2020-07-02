@@ -1,4 +1,4 @@
-package bicycleMatsim.RUCY.importNetwork;
+package bicycleMatsim.importnetwork;
 
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;

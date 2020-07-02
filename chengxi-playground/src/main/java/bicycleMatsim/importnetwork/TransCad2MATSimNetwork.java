@@ -1,4 +1,4 @@
-package bicycleMatsim.RUCY.importNetwork;
+package bicycleMatsim.importnetwork;
 
 import java.io.IOException;
 import java.util.Map;
@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
@@ -18,6 +19,7 @@ import com.google.common.collect.Table;
 import com.opencsv.exceptions.CsvException;
 
 import bicycleInMatsim.utility.CsvReaderToIteratable;
+// import floetteroed.utilities.Units;
 
 public class TransCad2MATSimNetwork {
 	private final String tcNodesFileName;
@@ -51,29 +53,28 @@ public class TransCad2MATSimNetwork {
 
 	private void run() throws IOException, CsvException {
 		// TODO Auto-generated method stub
-		CsvReaderToIteratable nodeReader = new CsvReaderToIteratable(this.tcNodesFileName,';');
-		Table<String, String, String> nodeTable = nodeReader.readTableWithUniqueID("TransCadID");
-		
-		
-		final Network matsimNetwork = NetworkUtils.createNetwork();
+        final Network matsimNetwork = NetworkUtils.createNetwork();
 		final NetworkFactory matsimNetworkFactory = matsimNetwork.getFactory();
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
+		
+		CsvReaderToIteratable nodeReader = new CsvReaderToIteratable(this.tcNodesFileName,';');
+		Table<String, String, String> nodeTable = nodeReader.readTableWithUniqueID("TransCadID");
 
 		final CoordinateTransformation coordinateTransform = StockholmTransformationFactory.getCoordinateTransformation(
 				StockholmTransformationFactory.WGS84, StockholmTransformationFactory.WGS84_SWEREF99);
         
 		// Save the nodes into Matsim nodes
 		//-----------------------------------
-		Set<String> TransCadIDSet=nodeTable.rowKeySet();
-		for (String TransCadID: TransCadIDSet) {
-			Map<String, String> ANode = nodeTable.row(TransCadID); 
+		Set<String> TransCadNodeIDSet=nodeTable.rowKeySet();
+		for (String TransCadNodeID: TransCadNodeIDSet) {
+			Map<String, String> ANode = nodeTable.row(TransCadNodeID); 
 			// transform each node into Matsim node object
 			double NodeLatitude= Double.parseDouble(ANode.get("latitude"));
 			double Nodelongtitude= Double.parseDouble(ANode.get("longtitude"));		
 			double NodeAltitude= Double.parseDouble(ANode.get("altitude"));	
 			final Coord coord = coordinateTransform.transform(new Coord(1e-6*Nodelongtitude, 1e-6*NodeLatitude, NodeAltitude));
-			final Node matsimNode = matsimNetworkFactory.createNode(Id.create(TransCadID, Node.class),coord);
-			System.out.println("Node added: "+TransCadID);
+			final Node matsimNode = matsimNetworkFactory.createNode(Id.create(TransCadNodeID, Node.class),coord);
+			System.out.println("Node added: "+TransCadNodeID);
 			matsimNetwork.addNode(matsimNode);
 			
 		}
@@ -87,7 +88,38 @@ public class TransCad2MATSimNetwork {
 		
 		// Save the links into Matsim links
 		//----------------------------------
-		
+		// to create matsim links you need 3 elements, ID (string) fromNode (Node) and toNode(Node)
+		CsvReaderToIteratable linkReader = new CsvReaderToIteratable(this.tcLinksFileName,';');
+		Table<String, String, String> linkTable = linkReader.readTableWithUniqueID("TransCadID");
+		Set<String> TransCadLinkIDSet=linkTable.rowKeySet();
+		for (String TransCadLinkID: TransCadLinkIDSet) {
+			Map<String, String> ALink = linkTable.row(TransCadLinkID); 
+			String FromNode= ALink.get("fromNode");
+			String ToNode= ALink.get("toNode");	
+			
+			// create a link
+			final Node matsimFromNode = matsimNetwork.getNodes().get(Id.create(FromNode, Node.class));
+			final Node matsimToNode = matsimNetwork.getNodes().get(Id.create(ToNode, Node.class));		
+			final Link matsimLink = matsimNetworkFactory.createLink(Id.create(TransCadLinkID, Link.class),
+					matsimFromNode, matsimToNode);
+			// set link length and speed as default attribute to links
+			double LinkLengthKM= Double.parseDouble(ALink.get("length"));
+			double LinkFreeSpeedKM_H= Double.parseDouble(ALink.get("bicycleTravelTime"));
+			matsimLink.setLength(LinkLengthKM*1000); // change back to: matsimLink.setLength(LinkLengthKM * Units.M_PER_KM);
+			matsimLink.setFreespeed(LinkFreeSpeedKM_H/3.6);   // change back to: matsimLink.setFreespeed(LinkFreeSpeedKM_H * Units.M_S_PER_KM_H);  when GunnarRepo is updated.
+			matsimNetwork.addLink(matsimLink);
+			
+			// specify which other attributes you want to save as link attributes
+			double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed"))/3.6;// change back to: double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed")) * Units.M_S_PER_KM_H;
+			double bicycleGeneralizedCost= Double.parseDouble(ALink.get("generalizedCost"));
+			
+			
+			linkAttributes.putAttribute(TransCadLinkID, "bicycleSpeed_M_S",bicycleSpeedM_S);
+			linkAttributes.putAttribute(TransCadLinkID, "generalizedCost",bicycleGeneralizedCost);
+			
+			
+			System.out.println("Link added: "+TransCadLinkID);
+		}
 		//----------------------------------
 		
 		
@@ -98,7 +130,7 @@ public class TransCad2MATSimNetwork {
 
 	public static void main(String[] args) throws IOException, CsvException {
 		// final String inputPath = "./ihop2/network-input/";
-		final String inputPath = "C:/Users/ChengxiL/OneDrive – VTI, Statens väg-och transportforskningsinstitut/JavaChengxiLiu/src/test/resources/";
+		final String inputPath = "C:/Users/ChengxiL/git/MatsimPlaygroundCLI/chengxi-playground/src/test/resources/";
 		final String nodesFile = inputPath + "Node.csv";
 		final String ConnectorsFile = inputPath + "Lane Connectors.csv";
 		final String linksFile = inputPath + "Links.csv";

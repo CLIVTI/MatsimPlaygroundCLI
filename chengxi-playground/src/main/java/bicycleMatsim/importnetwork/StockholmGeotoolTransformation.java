@@ -17,7 +17,7 @@
  * contact: salee@kth.se
  *
  */ 
-package bicycleMatsim.RUCY.importNetwork;
+package bicycleMatsim.importnetwork;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
@@ -28,8 +28,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
+//import com.vividsolutions.jts.geom.Point;
 /**
  * A class to convert coordinates from one coordinate system to
  * another one.

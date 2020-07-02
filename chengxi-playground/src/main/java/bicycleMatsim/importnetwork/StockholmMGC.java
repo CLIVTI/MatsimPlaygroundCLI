@@ -17,7 +17,7 @@
  * contact: salee@kth.se
  *
  */ 
-package bicycleMatsim.RUCY.importNetwork;
+package bicycleMatsim.importnetwork;
 
 
 import java.util.HashMap;

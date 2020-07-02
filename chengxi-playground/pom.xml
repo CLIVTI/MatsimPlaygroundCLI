@@ -8,6 +8,37 @@
 
 
 	<repositories>
+
+		<repository>
+			<id>osgeo</id>
+			<name>OSGeo Release Repository</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+
+		<repository>
+			<!-- MATSim is not on Maven central. -->
+			<id>matsim</id>
+			<url>https://dl.bintray.com/matsim/matsim</url>
+		</repository>
+
+		<repository>
+			<!-- For MATSim snapshots: -->
+			<id>ojo-snapshots</id>
+			<url>http://oss.jfrog.org/libs-snapshot</url>
+		</repository>
+
+		<repository>
+			<id>mvn-central</id>
+			<name>maven central</name>
+			<url>https://repo1.maven.org/maven2</url>
+		</repository>
+
 		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
@@ -16,6 +47,11 @@
 
 	</repositories>
 
+
+	<properties>
+		<matsim.version>11.0</matsim.version>
+		<geotools.version>20.5</geotools.version>
+	</properties>
 	<!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
@@ -25,11 +61,6 @@
 			<version>5.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-cql</artifactId>
-			<version>23.1</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.locationtech.jts</groupId>
@@ -37,13 +68,74 @@
 			<version>1.16.1</version>
 		</dependency>
 
+		<!-- <dependency> -->
+		<!-- <groupId>org.geotools</groupId> -->
+		<!-- <artifactId>gt-cql</artifactId> -->
+		<!-- <version>${geotools.version}</version> -->
+		<!-- </dependency> -->
 
 		<dependency>
-			<groupId>com.github.gunnarfloetteroed</groupId>
-			<artifactId>java</artifactId>
-			<version>2020-02-11_test05</version>
+			<!-- This is the matsim "core": -->
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim</artifactId>
+			<version>${matsim.version}</version>
 		</dependency>
 
+		<dependency>
+			<!-- Include the JUnit testing library. -->
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<!--MATSim test infrastructure. -->
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim</artifactId>
+			<type>test-jar</type>
+			<version>${matsim.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<!--to get ExamplesUtils: -->
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>roadpricing</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>com.github.simunto</groupId> <artifactId>matsim-sbb-extensions</artifactId> 
+			<version>0.11.0-2018w44</version> </dependency> -->
+
+		<dependency>
+			<groupId>com.github.schweizerischebundesbahnen</groupId>
+			<artifactId>matsim-sbb-extensions</artifactId>
+			<version>11.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/colt/colt -->
+		<dependency>
+			<groupId>colt</groupId>
+			<artifactId>colt</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+
+
+		<!-- <dependency> -->
+		<!-- <groupId>com.github.gunnarfloetteroed</groupId> -->
+		<!-- <artifactId>java</artifactId> -->
+		<!-- <version>2020-02-11_test05</version> -->
+		<!-- </dependency> -->
+
 	</dependencies>
+
 
 </project>
