@@ -1,6 +1,8 @@
 package bicycleMatsim.importnetwork;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -93,6 +95,8 @@ public class TransCad2MATSimNetwork {
 		// (2) Save the links into Matsim links
 		//----------------------------------
 		// to create matsim links you need 3 elements, ID (string) fromNode (Node) and toNode(Node)
+		Set<String> allowedModes = new HashSet<>(Arrays.asList("bike"));
+		
 		CsvReaderToIteratable linkReader = new CsvReaderToIteratable(this.tcLinksFileName,';');
 		Table<String, String, String> linkTable = linkReader.readTableWithUniqueID("TransCadID");
 		Set<String> TransCadLinkIDSet=linkTable.rowKeySet();
@@ -111,6 +115,7 @@ public class TransCad2MATSimNetwork {
 			double LinkFreeSpeedKM_H= Double.parseDouble(ALink.get("bicycleTravelTime"));
 			matsimLink.setLength(LinkLengthKM*1000); // change back to: matsimLink.setLength(LinkLengthKM * Units.M_PER_KM);
 			matsimLink.setFreespeed(LinkFreeSpeedKM_H/3.6);   // change back to: matsimLink.setFreespeed(LinkFreeSpeedKM_H * Units.M_S_PER_KM_H);  when GunnarRepo is updated.
+			matsimLink.setAllowedModes(allowedModes);
 			matsimNetwork.addLink(matsimLink);
 			
 			// specify which other attributes you want to save as link attributes
