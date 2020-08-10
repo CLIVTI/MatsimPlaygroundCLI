@@ -2,14 +2,13 @@ package bicycleMatsin.utilityTest;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+
 
 import bicycleMatsim.utility.MultinomialDistributionSampler;
 
 public class MultinomialDistributionSamplerTest {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		
 //		double[] test = {0.32, 0.68};
 //		double[] test2 = Arrays.copyOfRange(test, 0, test.length);
@@ -26,13 +25,25 @@ public class MultinomialDistributionSamplerTest {
 //		System.out.println("index is: "+index);
 		
 		
-		List<Double> weights = Arrays.asList(10.0,4.5,0.8,1.7,9.1);
+		List<Double> weights = Arrays.asList(1.0,1.0,1.0,0.5,0.5,0.5,0.5,0.5,1.0,4.0,1.0,1.0,1.0,1.0);
 		MultinomialDistributionSampler sampler = new MultinomialDistributionSampler(weights);
-		Integer[] result=sampler.sampleWitoutReplacement(8);
+		Integer[] result=sampler.sampleWithoutReplacement(5);
 		
 		for (int i=0; i<result.length;i++) {
-			System.out.println(result[i]);
+			System.out.println("sample without replacement is: "+ result[i]);
 		}
+		
+//		double[] originalWeight = sampler.getCdfWeights();
+//		for (int i=0; i<originalWeight.length;i++) {
+//			System.out.println("weight is: " +originalWeight[i]);
+//		}
+		
+		
+		Integer[] resultWithReplacement=sampler.sampleWithReplacement(8);
+		for (int i=0; i<resultWithReplacement.length;i++) {
+			System.out.println("sample with replacement is: "+ resultWithReplacement[i]);
+		}
+		
 	}
 
 }
