@@ -10,11 +10,16 @@ import com.google.common.primitives.Doubles;
 
 public class MultinomialDistributionSampler implements RandomDistributionSampler {
 	private final static Logger log = Logger.getLogger(RandomDistributionSampler.class);
-	private Random random = new Random();
-	private List<Double> weights;
-	private double sum;
-	private double[] cdfWeights;
+	protected Random random = new Random();
+	protected List<Double> weights;
+	protected double sum;
+	protected double[] cdfWeights;
 
+	
+	public MultinomialDistributionSampler() {
+		
+	}
+	
 	public MultinomialDistributionSampler(List<Double> weights) {
 		super();
 		this.weights = weights;
@@ -29,6 +34,26 @@ public class MultinomialDistributionSampler implements RandomDistributionSampler
 		this.cdfWeights = cdfWeights(weightsList);
 		this.sum = this.cdfWeights[weightsList.size() - 1];
 	}
+	
+//	public MultinomialDistributionSampler(Map<String, Double> weights) {
+//		super();
+//		// here weights are given as a Map object where the key (String) is given as what to be sampled, '
+//		// values (Double) given as weights
+//		String[] sampleCode = new String[weights.size()];
+//		double[] weightListFromInput = new double[weights.size()];
+//		int counter=0;
+//		for (Map.Entry<String, Double> entry : weights.entrySet()) {
+//			sampleCode[counter]=entry.getKey();
+//			weightListFromInput[counter]=entry.getValue();
+//			counter++;
+//		}
+//		
+//		List<Double> weightsList =Doubles.asList(weightListFromInput);
+//		this.weights = weightsList;
+//		this.cdfWeights = cdfWeights(weightsList);
+//		this.sum = this.cdfWeights[weightsList.size() - 1];
+//	}	
+	
 
 	public static double[] cdfWeights(List<Double> weights) {
 		double[] sortedWeights = new double[weights.size()];

@@ -1,10 +1,13 @@
 package bicycleMatsin.utilityTest;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 
 import bicycleMatsim.utility.MultinomialDistributionSampler;
+import bicycleMatsim.utility.MultinomialDistributionSamplerMap;
 
 public class MultinomialDistributionSamplerTest {
 
@@ -24,7 +27,7 @@ public class MultinomialDistributionSamplerTest {
 //		System.out.println("next random is: "+ nextRandom);
 //		System.out.println("index is: "+index);
 		
-		
+		// test MultinomialDistributionSampler
 		List<Double> weights = Arrays.asList(1.0,1.0,1.0,0.5,0.5,0.5,0.5,0.5,1.0,4.0,1.0,1.0,1.0,1.0);
 		MultinomialDistributionSampler sampler = new MultinomialDistributionSampler(weights);
 		Integer[] result=sampler.sampleWithoutReplacement(5);
@@ -42,6 +45,20 @@ public class MultinomialDistributionSamplerTest {
 		Integer[] resultWithReplacement=sampler.sampleWithReplacement(8);
 		for (int i=0; i<resultWithReplacement.length;i++) {
 			System.out.println("sample with replacement is: "+ resultWithReplacement[i]);
+		}
+		
+		// test class MultinomialDistributionSamplerMap
+		
+		HashMap<String, Object> testMap= new HashMap<String, Object>();
+		testMap.put("a", 2.0);
+		testMap.put("b", 1.0);
+		testMap.put("c", 3.0);
+		testMap.put("d", 3.0);
+		testMap.put("e", 1.0);
+		MultinomialDistributionSamplerMap testSampler= new MultinomialDistributionSamplerMap(testMap);
+		String[] sampleResults=testSampler.sampleMapWithoutReplacement(5);
+		for (int i=0; i<sampleResults.length;i++) {
+			System.out.println("Map sampler's sample without replacement is: "+ sampleResults[i]);
 		}
 		
 	}
