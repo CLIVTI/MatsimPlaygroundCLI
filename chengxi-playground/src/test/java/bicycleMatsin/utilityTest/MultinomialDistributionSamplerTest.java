@@ -49,12 +49,12 @@ public class MultinomialDistributionSamplerTest {
 		
 		// test class MultinomialDistributionSamplerMap
 		
-		HashMap<String, Object> testMap= new HashMap<String, Object>();
-		testMap.put("a", 2.0);
-		testMap.put("b", 1.0);
-		testMap.put("c", 3.0);
-		testMap.put("d", 3.0);
-		testMap.put("e", 1.0);
+		HashMap<String, String> testMap= new HashMap<>();
+		testMap.put("a", "2.0");
+		testMap.put("b", "1.0");
+		testMap.put("c", "3.0");
+		testMap.put("d", "3.0");
+		testMap.put("e", "1.0");
 		MultinomialDistributionSamplerMap testSampler= new MultinomialDistributionSamplerMap(testMap);
 		String[] sampleResults=testSampler.sampleMapWithoutReplacement(5);
 		for (int i=0; i<sampleResults.length;i++) {

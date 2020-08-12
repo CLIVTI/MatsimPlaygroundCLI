@@ -1,5 +1,7 @@
 package bicycleMatsim.utility;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,22 +29,18 @@ public class MultinomialDistributionSamplerMap extends MultinomialDistributionSa
 		this.sampleCode=output;
 	}
 	
-	public MultinomialDistributionSamplerMap(Map<String, Object> weights) {
+	public MultinomialDistributionSamplerMap(Map<String, String> weights) {
 		String[] sampleCode = new String[weights.size()];
 		double[] weightListFromInput = new double[weights.size()];
 		int counter=0;
-		for (Entry<String, Object> entry : weights.entrySet()) {
+		for (Entry<String, String> entry : weights.entrySet()) {
 			sampleCode[counter]=entry.getKey();
-			// if the map has String as the value
-			if(entry.getValue().getClass().equals(String.class) ) {
-				String element=(String) entry.getValue();
-				if(element.isEmpty()) {
-					element="0";
-				}
-				weightListFromInput[counter]=Double.parseDouble(element);
-			}else {  // if the map has double as the value
-				weightListFromInput[counter]=(double) entry.getValue();
+
+			String element= entry.getValue();
+			if(element.isEmpty()) {
+				element="0";
 			}
+			weightListFromInput[counter]=Double.parseDouble(element);
 			counter++;
 		}
 		
@@ -53,9 +51,12 @@ public class MultinomialDistributionSamplerMap extends MultinomialDistributionSa
 		this.sampleCode=sampleCode;
 	}
 	
+	public String sampleMap() {
+		int index = Arrays.binarySearch(this.cdfWeights, random.nextDouble() * this.sum);
+		int sampleIndex = (index >= 0) ? index : (-index - 1);
+		return this.sampleCode[sampleIndex];
+	}
 
-	
-	
 	public String[] sampleMapWithReplacement(int n) {
 		Integer[] samples =super.sampleWithReplacement(n);
 		String[] output = new String[samples.length]; 
