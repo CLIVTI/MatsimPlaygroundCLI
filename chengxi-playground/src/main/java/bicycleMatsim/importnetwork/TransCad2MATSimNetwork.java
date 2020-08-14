@@ -76,14 +76,19 @@ public class TransCad2MATSimNetwork {
 			
 			final Coord coord = coordinateTransform.transform(new Coord(1e-6*Nodelongtitude, 1e-6*NodeLatitude));
 			final Node matsimNode = matsimNetworkFactory.createNode(Id.create(TransCadNodeID, Node.class),coord);
-			System.out.println("Node added: "+TransCadNodeID);
-			matsimNetwork.addNode(matsimNode);
+			
 			
 			String NodeAltitude= ANode.get("altitude");	
 			String CentroidID= ANode.get("CentroidID");	
 			nodeAttributes.putAttribute(TransCadNodeID, "Altitude",NodeAltitude);
 			nodeAttributes.putAttribute(TransCadNodeID, "CentroidID",CentroidID);
 			
+			
+			
+			matsimNode.getAttributes().putAttribute("Altitude",NodeAltitude);
+			matsimNode.getAttributes().putAttribute("CentroidID",CentroidID);
+			matsimNetwork.addNode(matsimNode);
+			System.out.println("Node added: "+TransCadNodeID);
 		}
 		
 		nodeTable=null;
@@ -113,7 +118,7 @@ public class TransCad2MATSimNetwork {
 			matsimLink.setLength(LinkLengthKM*1000); // change back to: matsimLink.setLength(LinkLengthKM * Units.M_PER_KM);
 			matsimLink.setFreespeed(LinkFreeSpeedKM_H/3.6);   // change back to: matsimLink.setFreespeed(LinkFreeSpeedKM_H * Units.M_S_PER_KM_H);  when GunnarRepo is updated.
 			matsimLink.setAllowedModes(allowedModes);
-			matsimNetwork.addLink(matsimLink);
+			
 			
 			// specify which other attributes you want to save as link attributes
 			double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed"))/3.6;// change back to: double bicycleSpeedM_S= Double.parseDouble(ALink.get("bicycleSpeed")) * Units.M_S_PER_KM_H;
@@ -128,6 +133,13 @@ public class TransCad2MATSimNetwork {
 			linkAttributes.putAttribute(TransCadLinkID, "slope",lutning);
 			linkAttributes.putAttribute(TransCadLinkID, "connector",connector);
 			
+			// put link attributes
+			matsimLink.getAttributes().putAttribute("bicycleSpeed_M_S",bicycleSpeedM_S);
+			matsimLink.getAttributes().putAttribute("generalizedCost",bicycleGeneralizedCost);
+			matsimLink.getAttributes().putAttribute("linkType",linkType);
+			matsimLink.getAttributes().putAttribute("slope",lutning);
+			matsimLink.getAttributes().putAttribute("connector",connector);
+			matsimNetwork.addLink(matsimLink);
 			System.out.println("Link added: "+TransCadLinkID);
 		}
 		

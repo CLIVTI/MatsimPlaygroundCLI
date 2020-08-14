@@ -11,8 +11,10 @@ public class WriteConfigTest {
 		final String NetworkFile = inputPath + "network_test.xml";
 		final String planFile = inputPath + "population.xml";
 		final String configFile= inputPath+ "config_test.xml";
+		final String linkAttributeFile= inputPath+ "link_attributes_test.xml";
 		WriteConfigFromNetworkAndPopulation configWriter = new WriteConfigFromNetworkAndPopulation(NetworkFile, planFile, configFile);
-		configWriter.WriteConfig();
+		// configWriter.WriteConfig();
+		configWriter.EditConfig(linkAttributeFile);
 	}
 
 }

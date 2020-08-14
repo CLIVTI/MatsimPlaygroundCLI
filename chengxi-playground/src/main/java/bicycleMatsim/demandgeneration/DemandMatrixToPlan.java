@@ -39,7 +39,7 @@ public class DemandMatrixToPlan {
 		this.demandMatrixFileName = demandMatrixFileName;
 		this.matsimPlanFileName = matsimPlanFileName;
 		
-		// create a config file with 2 activities home and work
+		// create a config file with 2 activities: home and work
 		Config config = ConfigUtils.createConfig();
 
 		config.controler().setLastIteration(10);
@@ -60,12 +60,12 @@ public class DemandMatrixToPlan {
 		CsvReaderToIteratable demandMatrixReader = new CsvReaderToIteratable(this.demandMatrixFileName,';');
 		Table<String, String, String> demandMatrixTable = demandMatrixReader.readTableWithUniqueID(0);
 		
-		// calculate total number of trips per zone (row)
+		// 1. calculate total number of trips per zone (row)
 		Set<String> transCadOringinZoneIDSet=demandMatrixTable.rowKeySet();
 		double totalNumberOfTrips =0;
 		HashMap<String, String> numberOfTripsInEachOriginZone= new HashMap<>();
 		
-		// loop each origin zone
+		// 2. loop each origin zone to store number of trips in each origin zone (numberOfTripsInEachOriginZone).
 		for (String TransCadOriginZoneID: transCadOringinZoneIDSet) {
 			Map<String, String> oneOriginToAllDestination = demandMatrixTable.row(TransCadOriginZoneID);
 			double totalNumberOfTripInOringinZone = 0;
@@ -82,7 +82,7 @@ public class DemandMatrixToPlan {
 		}
 		
 		
-		// sample number of trips per zone
+		// 3. sample number of out-of-home trips per origin zone
 		MultinomialDistributionSamplerMap originZoneTripSampler= new MultinomialDistributionSamplerMap(numberOfTripsInEachOriginZone);
         int totalNumberOfTripsToBeSampled = (int) (totalNumberOfTrips/5);  // assuming we sample 20% of total number of out-of-home trips.
         String[] sampledTripsFromOrigin=originZoneTripSampler.sampleMapWithoutReplacement(totalNumberOfTripsToBeSampled);
@@ -90,8 +90,7 @@ public class DemandMatrixToPlan {
 			System.out.println("Map sampler's sample without replacement is: "+ sampledTripsFromOrigin[i]);
 		}
         
-        // for each sampled trip, we sample a destination and randomly generate a trip timing
-        // create a histogram of trip timing, 
+        // 4. for each sampled trip, we sample a destination and randomly generate a trip timing. Create a histogram of trip timing, 
         HashMap<String,String> departureTimeDistribution=new HashMap<>();
         departureTimeDistribution.put("1", "1");
         departureTimeDistribution.put("2", "1");
@@ -118,6 +117,8 @@ public class DemandMatrixToPlan {
         departureTimeDistribution.put("23", "1");
         departureTimeDistribution.put("24", "1");
         
+        
+        // 5. for each sampled trip, generate a person-plan for that.
         for (int i=0; i<sampledTripsFromOrigin.length;i++) {
         	String personID="person_"+(i+1);
         	String tripOrigin=sampledTripsFromOrigin[i];
@@ -135,7 +136,9 @@ public class DemandMatrixToPlan {
         	createOnePersonPlan(this.scenario,personID,tripOrigin,tripDestination,departureTimeInHour);
         }
         
-        PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), this.scenario.getNetwork());
+        
+        // 6. write the person-plan into a plan file.
+        PopulationWriter popwriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
 		popwriter.write(this.matsimPlanFileName);
 		
 //		Controler controler = new Controler(scenario);
